@@ -81,14 +81,64 @@ class CoinEx:
                     tmpStr = ""
                     for value,item in result[key][key2].items():
                         if float(item) > 0:
+                            tmpStr = tmpStr + " " + value + ":" + str(item).ljust(15)
+                        elif tmpStr != "":
                             tmpStr = tmpStr + " " + value + ":" + item
                     if tmpStr != "":
-                        print(key2, tmpStr)
+                        print(key2.ljust(4), tmpStr)
             else:
                 print(result[key])
+                
+    def order_pending(self, market_type):
+        url = 'https://api.coinex.com/v1/order/pending'
+        params = {}
+        params['market'] = market_type
+        params['page'] = 1
+        params['limit'] = 10
+        self.set_authorization(params)
+        print("----order_pending-----")
+        result = requests.get(url, params=params,headers=self.headers).json()
+        for key in result["data"].keys():
+            print(key, ":",result["data"][key])
+
+    def order_limit(self, params):
+        url = 'https://api.coinex.com/v1/order/limit'
+        self.set_authorization(params)
+        print("----order_limit-----")
+        result = requests.post(url, json=params, headers=self.headers).json()
+        print("実行結果", ":",result["message"])
+        orderId = ""
+        if result["code"] == 0:
+            print("order id", ":",result["data"]["id"])
+            orderId = result["data"]["id"]
+        return orderId
+
+    def cancel_order(self,id, market_type):
+        url = 'https://api.coinex.com/v1/order/pending'
+        params = {}
+        params['id'] = id
+        params['market'] = market_type
+        self.set_authorization(params)
+        print("----cancel_order-----")
+        result = requests.delete(url, params=params, headers=self.headers).json()
+        for key in result.keys():
+            print(key, ":",result[key])
 
 if __name__ == '__main__':
     CE = CoinEx()
-    CE.ticker()
+    #CE.ticker()
     CE.getAccountInfo()
+    
+    params = {
+        "amount": 30,
+        "price": 0.00019506,
+        "market": "CETBCH",
+        "type": "sell"
+    }
+    orderId = CE.order_limit(params)
+
+    CE.order_pending("CETBCH")
+    if orderId != "":
+        CE.cancel_order(orderId,"CETBCH")
+
 

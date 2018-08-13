@@ -61,19 +61,19 @@ class CoinEx:
         """ ティッカー [GET] """
 
         print("\nティッカー [GET]")
-        url = 'https://api.coinex.com/v1/market/ticker/all'
-        coinex = requests.get(url).json()
+        #url = 'https://api.coinex.com/v1/market/ticker/all'
+        coinex = requests.get(self.url + "/market/ticker/all").json()
         for key in coinex.keys():
             print(key, ":")
             print(coinex[key])
 
     def getAccountInfo(self):
         self.set_authorization({})
-        url = 'https://api.coinex.com/v1/balance/info'
+        #url = 'https://api.coinex.com/v1/balance/info'
         params = {}
         params['access_id'] = self.access_id
         params['tonce'] = int(time.time()*1000)
-        result = requests.get(url, params=params,headers=self.headers).json()
+        result = requests.get(self.url + "/balance/info", params=params,headers=self.headers).json()
         for key in result.keys():
             print(key, ":")
             if key == "data":
@@ -97,15 +97,15 @@ class CoinEx:
         params['limit'] = 10
         self.set_authorization(params)
         print("----order_pending-----")
-        result = requests.get(url, params=params,headers=self.headers).json()
+        result = requests.get(self.url + "/order/pending", params=params,headers=self.headers).json()
         for key in result["data"].keys():
             print(key, ":",result["data"][key])
 
     def order_limit(self, params):
-        url = 'https://api.coinex.com/v1/order/limit'
+        #url = 'https://api.coinex.com/v1/order/limit'
         self.set_authorization(params)
         print("----order_limit-----")
-        result = requests.post(url, json=params, headers=self.headers).json()
+        result = requests.post(self.url + "/order/limit", json=params, headers=self.headers).json()
         print("実行結果", ":",result["message"])
         orderId = ""
         if result["code"] == 0:
@@ -114,13 +114,13 @@ class CoinEx:
         return orderId
 
     def cancel_order(self,id, market_type):
-        url = 'https://api.coinex.com/v1/order/pending'
+        #url = 'https://api.coinex.com/v1/order/pending'
         params = {}
         params['id'] = id
         params['market'] = market_type
         self.set_authorization(params)
         print("----cancel_order-----")
-        result = requests.delete(url, params=params, headers=self.headers).json()
+        result = requests.delete(self.url + "/order/pending", params=params, headers=self.headers).json()
         for key in result.keys():
             print(key, ":",result[key])
 

@@ -1,6 +1,6 @@
 ﻿# operateApi
 # 各取引所のapi操作
-[coincheck](https://coincheck.com/)
+[coincheck](https://coincheck.com/)  
 [coinex](https://www.coinex.com/account/signin)
 
 ## 使い方

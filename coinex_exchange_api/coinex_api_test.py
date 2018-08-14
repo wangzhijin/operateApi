@@ -88,9 +88,10 @@ class CoinEx:
                         print(key2.ljust(4), tmpStr)
             else:
                 print(result[key])
+        print(result)
                 
     def order_pending(self, market_type):
-        url = 'https://api.coinex.com/v1/order/pending'
+        #url = 'https://api.coinex.com/v1/order/pending'
         params = {}
         params['market'] = market_type
         params['page'] = 1
@@ -106,10 +107,10 @@ class CoinEx:
         self.set_authorization(params)
         print("----order_limit-----")
         result = requests.post(self.url + "/order/limit", json=params, headers=self.headers).json()
-        print("実行結果", ":",result["message"])
+        print("実行結果：", result["message"])
         orderId = ""
         if result["code"] == 0:
-            print("order id", ":",result["data"]["id"])
+            print("order id：", result["data"]["id"])
             orderId = result["data"]["id"]
         return orderId
 
@@ -123,6 +124,25 @@ class CoinEx:
         result = requests.delete(self.url + "/order/pending", params=params, headers=self.headers).json()
         for key in result.keys():
             print(key, ":",result[key])
+
+    def get_depth(self, market_type):
+        print("----get_depth-----")
+        params = {}
+        params['merge'] = 0
+        params['market'] = market_type
+        params['limit'] = 5
+        
+        result = requests.get(self.url + "/market/depth", params=params).json()
+
+        print("asks:")  
+        for i in range(len(result["data"]["asks"])):
+            print(result["data"]["asks"][i][0].ljust(10), ":", result["data"]["asks"][i][1])
+
+        print("bids:")    
+        for i in range(len(result["data"]["bids"])):
+            print(result["data"]["bids"][i][0].ljust(10), ":", result["data"]["bids"][i][1])
+
+        print("最新成行:",result["data"]["last"])
 
 if __name__ == '__main__':
     CE = CoinEx()
@@ -140,5 +160,7 @@ if __name__ == '__main__':
     CE.order_pending("CETBCH")
     if orderId != "":
         CE.cancel_order(orderId,"CETBCH")
+    CE.get_depth("CETBCH")
+    
 
 
